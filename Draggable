@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="cn">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI 拖动（Draggable） - 默认功能</title>
+  <link rel="stylesheet" href="jquery-ui.css">
+  <script src="jquery-1.9.1.js"></script>
+  <script src="jquery-ui.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+  .draggable { width: 40px; height: 30px; padding: 0.5em; }
+  
+  .ui-widget-content {
+    border: 1px solid #aaaaaa;
+    background: #ffffff url(images/ui-bg_flat_75_ffffff_40x100.png) 50% 50% repeat-x;
+    color: #222222;
+	height:30px;
+  }
+  
+  
+  .ui-widget-header {
+    border: 1px solid #aaaaaa;
+    background: #cccccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x;
+    color: #222222;
+    font-weight: bold;
+	width:400px;
+	height:300px;
+}
+
+  .ui-widget-header1 {
+    border: 1px solid #aaaaaa;
+    background: #cccccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x;
+    color: black;
+    font-weight: bold;
+	width:400px;
+	height:300px;
+}
+
+  </style>
+  <script>
+  $(function() {
+      //$( "#datepicker" ).datepicker({maxDate: "+0D" });
+	  var dataPo1 = "position:relative;left:217px;top:202px";
+	  var dataPo2 = "position:relative;left:149px;top:266px";
+	  var dataPo3 = "position:relative;left:34px;top:142px";
+	  
+	  $( "#draggable1" ).attr('style',dataPo1);
+	  $( "#draggable2" ).attr('style',dataPo2);
+	  $( "#draggable3" ).attr('style',dataPo3);
+	  
+	  $( "#draggable" ).bind('click',function(){
+	     //alert($(this).attr('style'));
+	  });
+	  
+      $( "#draggable1" ).draggable({revert: "invalid", cursor: "move"});
+	  $( "#draggable2" ).draggable({revert: "invalid", cursor: "move"});
+	  $( "#draggable3" ).draggable({revert: "invalid", cursor: "move"});
+
+	  $('#target').droppable({
+        accept: "#target > div",
+        drop: function( event, ui ) {
+            //deleteImage( ui.draggable );
+			alert(1);
+			alert($(ui.draggable).attr("id"));
+         }
+       });
+	  
+	  
+	  
+	  $('#invo').droppable({
+        accept: "#target > div",
+        drop: function( event, ui ) {
+            //deleteImage( ui.draggable );
+			alert(2);
+			alert($(ui.draggable).attr("id"));
+         }
+       });
+	  
+  });
+  
+  function save(){
+     alert("1:::" + $('#target div').length);
+     alert("2:::" + $('#invo div').length);
+  }
+  </script>
+</head>
+<body>
+ 
+ <!--<p>日期：<input type="text" id="datepicker"></p>-->
+<div class="row" style="border:1px solid #ddd;margin:0;">
+
+<input type="button"  value="保存" onclick="save();" />
+
+<div id="target" class="ui-widget-header">
+  <p>标签展示区域</p>
+  
+  <div id="draggable1" class="ui-widget-content draggable">
+  <p>ZXX11</p>
+</div>
+
+<div id="draggable2" class="ui-widget-content draggable">
+  <p>ZXX2</p>
+</div>
+
+<div id="draggable3" class="ui-widget-content draggable">
+  <p>ZXX3</p>
+</div>
+</div>
+<div>&nbsp;</div>
+<div id="invo" class="ui-widget-header1">
+  <p>不展示区域</p>
+</div>
+ 
+ 
+</div>
+</body>
+</html>
