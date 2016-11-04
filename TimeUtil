@@ -1,0 +1,297 @@
+package com.zte.ums.ipeg.wuxi.theme.util;
+
+import org.json.JSONArray;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+/**
+ * <p><owner>00186777</owner> </p>
+ * <p><createdate>2016-05-26</createdate></p>
+ * <p/>
+ * <p>版权所有: 版权所有(C)2001-2020</p>
+ * <p>公司名称: 深圳市中兴通讯股份有限公司</p>
+ *
+ * @author 00186777
+ * @version 1.0
+ */
+public class TimeAccess {
+    private static DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static DateFormat sdf_day = new SimpleDateFormat("yyyy-MM-dd");
+    private static TimeAccess instance = new TimeAccess();
+
+    private TimeAccess() {
+    }
+
+    public static TimeAccess getInstance() {
+        return instance;
+    }
+
+    public static Date getCurrYearFirst(int year) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(Calendar.YEAR, year);
+        return calendar.getTime();
+    }
+
+    public static Date getCurrYearLast(int year) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(Calendar.YEAR, year);
+        calendar.roll(Calendar.DAY_OF_YEAR, -1);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        return calendar.getTime();
+    }
+
+    //获取给定时间的今年、去年年初，年末时间
+    public static String[] getThisYearAndBefore(String time) {
+        String[] newTime = time.split("-");
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.YEAR, Integer.parseInt(newTime[0]));
+        calendar.set(Calendar.MONTH, Integer.parseInt(newTime[1]) - 1);
+        int dayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        if (day > dayOfMonth) {
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        } else {
+            calendar.set(Calendar.DAY_OF_MONTH, day);
+        }
+        int year = Integer.parseInt(newTime[0]);
+        String[] result = new String[4];
+        result[0] = sdf.format(getCurrYearFirst(year));
+        result[1] = sdf.format(calendar.getTime());
+        result[2] = sdf.format(getCurrYearFirst(year - 1));
+        result[3] = sdf.format(getCurrYearLast(year - 1));
+        return result;
+    }
+
+    //获取指定时间的这个月和上个月
+    public static String[] getThisMonthAndBefore(String time) {
+        String[] newTime = time.split("-");
+        String[] result = new String[4];
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int monthOfNow = calendar.get(Calendar.MONTH) + 1;
+        calendar.set(Calendar.YEAR, Integer.parseInt(newTime[0]));
+        calendar.set(Calendar.MONTH, Integer.parseInt(newTime[1]) - 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        if (monthOfNow == Integer.parseInt(newTime[1])) {
+            calendar.add(Calendar.MONTH, -1);
+        }
+        date = calendar.getTime();
+        result[0] = sdf.format(date);
+        calendar.add(Calendar.MONTH, -1);
+        date = calendar.getTime();
+        result[2] = sdf.format(date);
+        calendar.add(Calendar.MONTH, 1);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        date = calendar.getTime();
+        result[3] = sdf.format(date);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.MONTH, 2);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        date = calendar.getTime();
+        result[1] = sdf.format(date);
+        return result;
+    }
+
+    //获取指定时间的昨天和前天
+    public static String[] getYesterdayAndBefore(String time) {
+        String[] newTime = time.split("-");
+        String[] result = new String[4];
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.clear();
+        calendar.set(Calendar.YEAR, Integer.parseInt(newTime[0]));
+        calendar.set(Calendar.MONTH, Integer.parseInt(newTime[1]) - 1);
+        int dayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        if (day > dayOfMonth) {
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        } else {
+            calendar.set(Calendar.DAY_OF_MONTH, day);
+        }
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        date = calendar.getTime();
+        result[0] = sdf.format(date);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        date = calendar.getTime();
+        result[2] = sdf.format(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        date = calendar.getTime();
+        result[3] = sdf.format(date);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        date = calendar.getTime();
+        result[1] = sdf.format(date);
+        return result;
+    }
+
+    public static JSONArray getEverydayOfThisMonth(String time) {
+        String[] newTime = time.split("-");
+        JSONArray array = new JSONArray();
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int nowMonth = calendar.get(Calendar.MONTH) + 1;
+        if (nowMonth != Integer.parseInt(newTime[1])) {
+            calendar.set(Calendar.YEAR, Integer.parseInt(newTime[0]));
+            calendar.set(Calendar.MONTH, Integer.parseInt(newTime[1]));
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+        }
+        String lastDay = sdf_day.format(calendar.getTime());
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        String firstDay = sdf_day.format(calendar.getTime());
+        String temp = firstDay;
+        array.put(firstDay);
+        while (!temp.equals(lastDay)) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            temp = sdf_day.format(calendar.getTime());
+            array.put(temp);
+        }
+        return array;
+    }
+
+    //获取从上月开始往前推最近6个月的时间
+    public static String[] getLatestSixMonth() {
+        Date date = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        String[] result = new String[2];
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        result[0] = sdf.format(calendar.getTime());
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.MONTH, -5);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        result[1] = sdf.format(calendar.getTime());
+        return result;
+    }
+
+    // 获取传入当年一月到传入当年当月的时间
+    public static String[] getMonthdayAndBefore(int year, int month) {
+        String[] result = new String[2];
+        Calendar calendar = Calendar.getInstance();
+        result[0] = sdf.format(getCurrYearFirst(year));
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        calendar.set(Calendar.YEAR, year);
+        result[1] = sdf.format(calendar.getTime());
+        return result;
+    }
+
+    // 获取传入日期最近的6个月开始和结束时间
+    public static String[] getSixMonth(int year, int month) {
+        String[] result = new String[2];
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        if (month < 6) {
+            calendar.set(Calendar.YEAR, year - 1);
+            month = month + 6;
+            calendar.set(Calendar.MONTH, month);
+        } else {
+            calendar.set(Calendar.YEAR, year);
+            month = month - 6;
+            calendar.set(Calendar.MONTH, month);
+        }
+        result[0] = sdf.format(calendar.getTime());
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.MONTH, 6);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        result[1] = sdf.format(calendar.getTime());
+        return result;
+    }
+
+    // 获取去年和前年一年间隔的时间，由传入时间决定结尾时间。如2015.6-2016.5,2014.6-2015.5
+    public static String[] getMonthAndBefore(int year, int month) {
+        String[] result = new String[4];
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.DAY_OF_MONTH, 0);
+        calendar.set(Calendar.MONTH, month);
+        result[1] = sdf.format(calendar.getTime());
+        calendar.add(Calendar.YEAR, -1);
+        result[3] = sdf.format(calendar.getTime());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.add(Calendar.MONTH, 1);
+        result[0] = sdf.format(calendar.getTime());
+        calendar.add(Calendar.YEAR, -1);
+        result[2] = sdf.format(calendar.getTime());
+        return result;
+    }
+
+    //获取最近monthNum个月的每个月的月初、月末时间
+    public static String[] getEveryMonthAndBefore(int monthNum, int year, int month) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(Calendar.YEAR, year);
+        calendar.add(Calendar.MONTH, month - 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        String[] result = new String[monthNum * 2];
+        for (int i = 0; i < monthNum; i++) {
+            result[2 * monthNum - 2 - 2 * i] = sdf.format(calendar.getTime());
+            calendar.add(Calendar.MONTH, -1);
+        }
+        calendar.add(Calendar.MONTH, 2);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        for (int j = 0; j < monthNum; j++) {
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+            result[j * 2 + 1] = sdf.format(calendar.getTime());
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.MONTH, 1);
+        }
+        return result;
+    }
+
+
+    public static  void main (String[]args){
+        System.out.println(getYesterdayAndBefore("2016-10")[0]);
+        System.out.println(getYesterdayAndBefore("2016-10")[1]);
+
+    }
+}
